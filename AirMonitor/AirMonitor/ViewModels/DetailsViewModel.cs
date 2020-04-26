@@ -6,7 +6,7 @@ using System.Text;
 
 namespace AirMonitor.ViewModels
 {
-    class DetailsViewModel : BaseViewModels
+    public class DetailsViewModel : BaseViewModel
     {
 
         public DetailsViewModel()

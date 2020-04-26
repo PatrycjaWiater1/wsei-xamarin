@@ -8,24 +8,25 @@
              xmlns:controls="clr-namespace:AirMonitor.Views.Controls"
              xmlns:viewModels="clr-namespace:AirMonitor.ViewModels"
              BackgroundColor="#f9f9f9">
+
     <ContentPage.BindingContext>
-        <viewModels:DetailsViewModel/>
+        <viewModels:DetailsViewModel />
     </ContentPage.BindingContext>
+
     <ScrollView>
         <Grid>
             <StackLayout
                 Padding="24"
                 Spacing="12">
                 <Frame
-                   Style="{StaticResource CaqiFrameStyle}"
-                    >
+                    Style="{StaticResource CaqiFrameStyle}">
                     <Label
                      HorizontalTextAlignment="Center"
                         VerticalTextAlignment="Center">
                         <Label.FormattedText>
                             <FormattedString>
                                 <Span
-                                    Text="{ Binding CaqiValue }"
+                                    Text="{Binding CaqiValue}"
                                     FontAttributes="Bold"
                                     TextColor="Black"
                                     FontSize="32"/>
@@ -81,15 +82,15 @@
                             </Label>
                         </controls:ContentWithHeader.ControlContent>
                     </controls:ContentWithHeader>
-                
+
                     <BoxView
                         Grid.Column="1"
                         VerticalOptions="Fill"
                         HorizontalOptions="Center"
                         WidthRequest="1"
                         BackgroundColor="LightGray"/>
-                    
-                    
+
+
                     <controls:ContentWithHeader
                         Title="PM 10"
                         Grid.Column="2">
@@ -116,7 +117,7 @@
                     </controls:ContentWithHeader>
                 </Grid>
 
-                
+
                 <BoxView
                     HeightRequest="1"
                     HorizontalOptions="Fill"
@@ -136,7 +137,7 @@
                         </StackLayout>
                     </controls:ContentWithHeader.ControlContent>
                 </controls:ContentWithHeader>
-                
+
                 <BoxView
                     HeightRequest="1"
                     HorizontalOptions="Fill"

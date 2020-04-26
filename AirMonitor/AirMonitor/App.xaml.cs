@@ -23,8 +23,6 @@ namespace AirMonitor
         {
             InitializeComponent();
 
-
-
             InitializeApp();
         }
 
@@ -33,8 +31,6 @@ namespace AirMonitor
         private async Task InitializeApp()
         {
             await LoadConfig();
-
-
 
             MainPage = new RootTabbedPage();
         }
@@ -47,16 +43,12 @@ namespace AirMonitor
             var resourceNames = assembly.GetManifestResourceNames();
             var configName = resourceNames.FirstOrDefault(s => s.Contains("config.json"));
 
-
-
             using (var stream = assembly.GetManifestResourceStream(configName))
             {
                 using (var reader = new StreamReader(stream))
                 {
                     var json = await reader.ReadToEndAsync();
                     var dynamicJson = JObject.Parse(json);
-
-
 
                     AirlyApiKey = dynamicJson["AirlyApiKey"].Value<string>();
                     AirlyApiUrl = dynamicJson["AirlyApiUrl"].Value<string>();

@@ -4,12 +4,14 @@
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
+             xmlns:models="clr-namespace:AirMonitor.Models"
              x:Class="AirMonitor.Views.HomePage">
+
     <ListView ItemsSource="{Binding Items}">
         <ListView.ItemTemplate>
             <DataTemplate>
                 <TextCell Text="{Binding Address.Description}"
-                          Detail="Later ToDo" />
+                          Detail="Later Todo" />
             </DataTemplate>
         </ListView.ItemTemplate>
     </ListView>

@@ -17,12 +17,16 @@ using Xamarin.Forms;
 
 namespace AirMonitor.ViewModels
 {
-    public class HomeViewModel : BaseViewModels
+    public class HomeViewModel : BaseViewModel
     {
         private readonly INavigation _navigation;
+
+
+
         public HomeViewModel(INavigation navigation)
         {
             _navigation = navigation;
+
             Initialize();
         }
 
@@ -47,6 +51,8 @@ namespace AirMonitor.ViewModels
                 return null;
             }
 
+
+
             var query = GetQuery(new Dictionary<string, object>
             {
                 { "lat", location.Latitude },
@@ -55,9 +61,14 @@ namespace AirMonitor.ViewModels
                 { "maxResults", maxResults }
             });
             var url = GetAirlyApiUrl(App.AirlyApiInstallationUrl, query);
+
+
+
             var response = await GetHttpResponseAsync<IEnumerable<Installation>>(url);
             return response;
         }
+
+
 
         private string GetAirlyApiUrl(string path, string query)
         {
@@ -67,14 +78,15 @@ namespace AirMonitor.ViewModels
             builder.Query = query;
             string url = builder.ToString();
 
-
-
             return url;
         }
+
+
 
         private string GetQuery(IDictionary<string, object> args)
         {
             if (args == null) return null;
+
             var query = HttpUtility.ParseQueryString(string.Empty);
 
             foreach (var arg in args)
@@ -92,15 +104,20 @@ namespace AirMonitor.ViewModels
             return query.ToString();
         }
 
+
+
         private static HttpClient GetHttpClient()
         {
             var client = new HttpClient();
             client.BaseAddress = new Uri(App.AirlyApiUrl);
+
             client.DefaultRequestHeaders.Add("Accept", "application/json");
             client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip");
             client.DefaultRequestHeaders.Add("apikey", App.AirlyApiKey);
             return client;
         }
+
+
 
         private async Task<T> GetHttpResponseAsync<T>(string url)
         {
@@ -114,6 +131,8 @@ namespace AirMonitor.ViewModels
                 {
                     System.Diagnostics.Debug.WriteLine($"Day limit: {dayLimit?.FirstOrDefault()}, remaining: {dayLimitRemaining?.FirstOrDefault()}");
                 }
+
+
 
                 switch ((int)response.StatusCode)
                 {
@@ -143,8 +162,12 @@ namespace AirMonitor.ViewModels
                 System.Diagnostics.Debug.WriteLine(ex);
             }
 
+
+
             return default;
         }
+
+
 
         private async Task<Location> GetLocation()
         {
@@ -152,8 +175,12 @@ namespace AirMonitor.ViewModels
             return location;
         }
 
+
+
         private ICommand _goToDetailsCommand;
         public ICommand GoToDetailsCommand => _goToDetailsCommand ?? (_goToDetailsCommand = new Command(OnGoToDetails));
+
+
 
         private void OnGoToDetails()
         {
