@@ -21,8 +21,6 @@ namespace AirMonitor.ViewModels
     {
         private readonly INavigation _navigation;
 
-
-
         public HomeViewModel(INavigation navigation)
         {
             _navigation = navigation;
@@ -40,8 +38,9 @@ namespace AirMonitor.ViewModels
         private async Task Initialize()
         {
             var location = await GetLocation();
-            var installations = await GetInstallations(location, maxResults: 7);
-            Items = new List<Installation>(installations);
+            var installations = await GetInstallations(location, maxResults: 1);
+            var installationsWithDetails = await GetDetails(installations);
+            Items = new List<Installation>(installationsWithDetails);
         }
         private async Task<IEnumerable<Installation>> GetInstallations(Location location, double maxDistanceInKm = 3, int maxResults = -1)
         {
@@ -51,8 +50,6 @@ namespace AirMonitor.ViewModels
                 return null;
             }
 
-
-
             var query = GetQuery(new Dictionary<string, object>
             {
                 { "lat", location.Latitude },
@@ -61,14 +58,26 @@ namespace AirMonitor.ViewModels
                 { "maxResults", maxResults }
             });
             var url = GetAirlyApiUrl(App.AirlyApiInstallationUrl, query);
-
-
-
             var response = await GetHttpResponseAsync<IEnumerable<Installation>>(url);
             return response;
         }
 
-
+        private async Task<IEnumerable<Installation>> GetDetails(IEnumerable<Installation> installations)
+        {
+            var installationsWithDetails = new List<Installation>();
+            foreach (var installation in installations)
+            {
+                var query = GetQuery(new Dictionary<string, object>
+                {
+                    {"installationId", installation.Id }
+                });
+                var url = GetAirlyApiUrl(App.AirlyApiMeasurementUrl, query);
+                var response = await GetHttpResponseAsync<Measurement>(url);
+                installation.Measurement = response;
+                installationsWithDetails.Add(installation);
+            }
+            return installationsWithDetails;
+        }
 
         private string GetAirlyApiUrl(string path, string query)
         {
@@ -80,9 +89,6 @@ namespace AirMonitor.ViewModels
 
             return url;
         }
-
-
-
         private string GetQuery(IDictionary<string, object> args)
         {
             if (args == null) return null;
@@ -103,9 +109,6 @@ namespace AirMonitor.ViewModels
 
             return query.ToString();
         }
-
-
-
         private static HttpClient GetHttpClient()
         {
             var client = new HttpClient();
@@ -113,12 +116,10 @@ namespace AirMonitor.ViewModels
 
             client.DefaultRequestHeaders.Add("Accept", "application/json");
             client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip");
+            client.DefaultRequestHeaders.Add("Accept-Language", "pl");
             client.DefaultRequestHeaders.Add("apikey", App.AirlyApiKey);
             return client;
         }
-
-
-
         private async Task<T> GetHttpResponseAsync<T>(string url)
         {
             try
@@ -131,8 +132,6 @@ namespace AirMonitor.ViewModels
                 {
                     System.Diagnostics.Debug.WriteLine($"Day limit: {dayLimit?.FirstOrDefault()}, remaining: {dayLimitRemaining?.FirstOrDefault()}");
                 }
-
-
 
                 switch ((int)response.StatusCode)
                 {
@@ -162,29 +161,20 @@ namespace AirMonitor.ViewModels
                 System.Diagnostics.Debug.WriteLine(ex);
             }
 
-
-
             return default;
         }
-
-
-
         private async Task<Location> GetLocation()
         {
             Location location = await Geolocation.GetLastKnownLocationAsync();
             return location;
         }
-
-
-
         private ICommand _goToDetailsCommand;
-        public ICommand GoToDetailsCommand => _goToDetailsCommand ?? (_goToDetailsCommand = new Command(OnGoToDetails));
+        public ICommand GoToDetailsCommand => _goToDetailsCommand 
+                ?? (_goToDetailsCommand = new Command<Installation>(installation => OnGoToDetails(installation)));
 
-
-
-        private void OnGoToDetails()
+        private void OnGoToDetails(Installation installation)
         {
-            _navigation.PushAsync(new DetailsPage());
+            _navigation.PushAsync(new DetailsPage(installation));
         }
     }
 }
