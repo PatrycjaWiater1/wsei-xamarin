@@ -41,11 +41,11 @@
                     </Label>
                 </Frame>
                 <Label
-                    Text="Świetna jakość!"
+                    Text="{Binding Description}"
                     Style="{StaticResource TitleStyle}"
                     HorizontalTextAlignment="Center"/>
                 <Label
-                    Text="Możesz bezpiecznie wyjść z domu bez swojej maski anty-smogowej i nie bać się o swoje zdrowie."
+                    Text="{Binding Advice}"
                     FontSize="14"
                     TextColor="Black" />
 
@@ -126,7 +126,7 @@
                     <controls:ContentWithHeader.ControlContent>
                         <StackLayout>
                             <Label
-                                Text="95%"
+                                Text="{Binding Humidity}"
                                 FontSize="20"
                                 TextColor="Black" />
                             <Slider
@@ -146,7 +146,7 @@
                     <controls:ContentWithHeader.ControlContent>
                         <StackLayout>
                             <Label
-                                Text="1026 hPa"
+                                Text="{Binding Pressure}"
                                 FontSize="20"
                                 TextColor="Black" />
                             <!-- Set Maximum before Minimum in Slider -->

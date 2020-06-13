@@ -9,6 +9,7 @@ namespace AirMonitor.Models
     {
         public int Id { get; set; }
         public Address Address { get; set; }
+        public LocationC Location { get; set; }
         public double Elevation { get; set; }
         [JsonProperty(PropertyName = "airly")]
         public bool IsAirlyInstallation { get; set; }

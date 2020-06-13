@@ -12,8 +12,7 @@ using AirMonitor.Views;
 using Newtonsoft.Json;
 using Xamarin.Essentials;
 using Xamarin.Forms;
-
-
+using Xamarin.Forms.Maps;
 
 namespace AirMonitor.ViewModels
 {
@@ -35,14 +34,36 @@ namespace AirMonitor.ViewModels
             set => SetProperty(ref _items, value);
         }
 
+        private bool _loaderEnabled;
+        public bool LoaderEnabled
+        {
+            get => _loaderEnabled;
+            set => SetProperty(ref _loaderEnabled, value);
+        }
+
+        private List<MapLocation> _locations;
+        public List<MapLocation> Locations
+        {
+            get => _locations;
+            set => SetProperty(ref _locations, value);
+        }
+
         private async Task Initialize()
         {
+            LoaderEnabled = true;
             var location = await GetLocation();
-            var installations = await GetInstallations(location, maxResults: 1);
+            var installations = await GetInstallations(location, maxResults: 3);
             var installationsWithDetails = await GetDetails(installations);
             Items = new List<Installation>(installationsWithDetails);
+            Locations = Items.Select(x => new MapLocation
+            {
+                Address = x.Address.Description,
+                Description = "CAQI: " + x.Measurement.Current.Indexes.FirstOrDefault().Value.ToString(),
+                Position = new Position(x.Location.Latitude, x.Location.Longitude)
+            }).ToList();
+            LoaderEnabled = false;
         }
-        private async Task<IEnumerable<Installation>> GetInstallations(Location location, double maxDistanceInKm = 3, int maxResults = -1)
+        private async Task<IEnumerable<Installation>> GetInstallations(Location location, double maxDistanceInKm = 4, int maxResults = -1)
         {
             if (location == null)
             {
@@ -69,11 +90,12 @@ namespace AirMonitor.ViewModels
             {
                 var query = GetQuery(new Dictionary<string, object>
                 {
-                    {"installationId", installation.Id }
+                    { "installationId", installation.Id }
                 });
                 var url = GetAirlyApiUrl(App.AirlyApiMeasurementUrl, query);
-                var response = await GetHttpResponseAsync<Measurement>(url);
-                installation.Measurement = response;
+                var measurement = await GetHttpResponseAsync<Measurement>(url);
+                if (measurement == null) continue;
+                installation.Measurement = measurement;
                 installationsWithDetails.Add(installation);
             }
             return installationsWithDetails;
@@ -174,6 +196,15 @@ namespace AirMonitor.ViewModels
 
         private void OnGoToDetails(Installation installation)
         {
+            _navigation.PushAsync(new DetailsPage(installation));
+        }
+
+        private ICommand _goToDetailsCommandFromMap;
+        public ICommand GoToDetailsCommandFromMap => _goToDetailsCommandFromMap ?? (_goToDetailsCommandFromMap = new Command<string>(address => OnGoToDetailsFromMap(address)));
+
+        private void OnGoToDetailsFromMap(string address)
+        {
+            var installation = Items.First(x => x.Address.Description == address);
             _navigation.PushAsync(new DetailsPage(installation));
         }
     }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Xamarin.Forms;
@@ -16,7 +17,14 @@ namespace AirMonitor.ViewModels
 
         public DetailsViewModel(INavigation navigation, Installation installation)
         {
-
+            _navigation = navigation;
+            CaqiValue = Convert.ToInt32(installation.Measurement.Current.Indexes.FirstOrDefault().Value);
+            Pm25Value = Convert.ToInt32(installation.Measurement.Current.Values.FirstOrDefault(x => x.Name == "PM25").Value);
+            Pm10Value = Convert.ToInt32(installation.Measurement.Current.Values.FirstOrDefault(x => x.Name == "PM10").Value);
+            Humidity = Convert.ToInt32(installation.Measurement.Current.Values.FirstOrDefault(x => x.Name == "HUMIDITY").Value);
+            Pressure = Convert.ToInt32(installation.Measurement.Current.Values.FirstOrDefault(x => x.Name == "PRESSURE").Value);
+            Description = installation.Measurement.Current.Indexes.FirstOrDefault().Description;
+            Advice = installation.Measurement.Current.Indexes.FirstOrDefault().Advice;
         }
         private int _caqiValue;
         public int CaqiValue
